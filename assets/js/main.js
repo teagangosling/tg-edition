@@ -6,6 +6,7 @@ var st = 0;
 cover();
 featured();
 pagination(false);
+expandableImages();
 
 window.addEventListener('scroll', function () {
     'use strict';
@@ -45,6 +46,64 @@ function cover() {
         var element = cover.nextElementSibling;
         element.scrollIntoView({behavior: 'smooth', block: 'start'});
     });
+}
+
+// The shared theme assets only make gallery images and image cards that
+// carry width/height attributes clickable. Everything else - feature images,
+// images pasted into HTML cards, older image cards without dimensions - is
+// picked up here and gets a single-image lightbox.
+function expandableImages() {
+    'use strict';
+    if (typeof PhotoSwipe === 'undefined') return;
+
+    var alreadyHandled = '.kg-image-card > .kg-image[width][height], .kg-gallery-image > img';
+    // Images that are part of another control, or already a link somewhere.
+    var notAnImage = 'a, .kg-bookmark-card, .kg-product-card, .kg-header-card';
+
+    document.querySelectorAll('.gh-content img, .single-media img').forEach(function (img) {
+        if (img.matches(alreadyHandled) || img.closest(notAnImage)) return;
+
+        img.classList.add('is-expandable');
+        img.addEventListener('click', function () {
+            openImage(img);
+        });
+    });
+}
+
+function openImage(img) {
+    'use strict';
+    var pswpElement = document.querySelector('.pswp');
+    if (!pswpElement) return;
+
+    // The width/height attributes describe the original upload; naturalWidth
+    // only describes whichever srcset variant happens to be loaded, so it is
+    // the fallback rather than the first choice.
+    var item = {
+        src: img.getAttribute('src'),
+        msrc: img.currentSrc || img.getAttribute('src'),
+        w: parseInt(img.getAttribute('width'), 10) || img.naturalWidth,
+        h: parseInt(img.getAttribute('height'), 10) || img.naturalHeight,
+        el: img,
+    };
+
+    if (!item.src || !item.w || !item.h) return;
+
+    var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, [item], {
+        bgOpacity: 0.9,
+        closeOnScroll: true,
+        fullscreenEl: false,
+        history: false,
+        index: 0,
+        shareEl: false,
+        zoomEl: false,
+        getThumbBoundsFn: function () {
+            var pageYScroll = window.pageYOffset || document.documentElement.scrollTop;
+            var rect = img.getBoundingClientRect();
+
+            return {x: rect.left, y: rect.top + pageYScroll, w: rect.width};
+        },
+    });
+    gallery.init();
 }
 
 function featured() {

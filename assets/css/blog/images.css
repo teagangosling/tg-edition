@@ -1,0 +1,28 @@
+/* Cap how tall any single image can render, so a very tall photo can't
+   take over the whole screen. Width is left free to shrink along with the
+   height, which is what keeps the aspect ratio intact - clamping height
+   alone against a fixed width would squash the image.
+
+   Gallery images are deliberately left alone: their width/height is driven
+   by the flex row in Ghost's own card styles. */
+
+.gh-content .kg-image,
+.gh-content > img,
+.gh-content p > img,
+.single-media img {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 100rem;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+/* Anything that opens full size on click gets the same affordance, whether
+   it's wired up by the shared theme assets or by expandableImages(). */
+
+.kg-image[width][height],
+.kg-gallery-image,
+.is-expandable {
+    cursor: zoom-in;
+}
