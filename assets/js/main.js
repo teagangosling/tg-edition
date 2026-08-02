@@ -106,6 +106,107 @@ function openImage(img) {
     gallery.init();
 }
 
+// Random publication cover.
+//
+// Ghost renders one fixed cover, @site.cover_image, set in Admin. To rotate
+// through a pool of images we need to know what is in that pool, and a
+// Handlebars theme cannot list a directory - there is no helper for it and no
+// endpoint that enumerates /content/images/. So a small manifest file, written
+// next to the images by scripts/build-cover-manifest.sh, stands in for the
+// directory listing.
+//
+// This is strictly an enhancement layered on top of the normal cover. The
+// Admin-configured image is what the server renders and what every visitor
+// sees if JS is off, the manifest is missing, the fetch fails, the manifest is
+// empty, or the chosen file will not load.
+function coverPool() {
+    'use strict';
+
+    // Ghost serves /content/images/** through serve-static with no extension
+    // filter, so a .json dropped in the covers folder is fetchable.
+    var MANIFEST_URL = '/content/images/covers/covers.json';
+    var PENDING_CLASS = 'cover-pool-pending';
+    // If the manifest or the chosen image is slow, stop waiting and just show
+    // the default rather than sitting on a dark screen.
+    var GIVE_UP_MS = 1500;
+
+    var cover = document.querySelector('.cover');
+    var image = cover && cover.querySelector('.cover-image');
+
+    // `.cover` is only rendered on the homepage, and `.cover-image` only exists
+    // when a cover is configured in Admin. Either way, nothing to enhance.
+    if (!image || typeof window.fetch !== 'function') {
+        return;
+    }
+
+    var settled = false;
+    var giveUp;
+
+    function reveal() {
+        if (settled) {
+            return;
+        }
+        settled = true;
+        window.clearTimeout(giveUp);
+        cover.classList.remove(PENDING_CLASS);
+    }
+
+    // Held from here until we have either swapped the image or given up, so the
+    // default is not shown and then yanked away. See site/cover-pool.css.
+    cover.classList.add(PENDING_CLASS);
+    giveUp = window.setTimeout(reveal, GIVE_UP_MS);
+
+    function urlFor(entry, base) {
+        if (typeof entry !== 'string' || !entry) {
+            return null;
+        }
+        // Already an absolute path or URL - take it as given.
+        if (entry.charAt(0) === '/' || /^(https?:)?\/\//.test(entry)) {
+            return entry;
+        }
+        // Bare filenames come out of the manifest unescaped so that the shell
+        // script does not have to do percent-encoding. Spaces and friends are
+        // encoded here instead.
+        return base + entry.split('/').map(encodeURIComponent).join('/');
+    }
+
+    // Ghost sends a one-year Cache-Control on everything under /content/images/,
+    // which would hide newly added covers for a very long time. `no-store` skips
+    // the browser cache and the coarse cache-buster gets past any proxy in
+    // front, while still collapsing to one manifest fetch per minute.
+    var url = MANIFEST_URL + '?v=' + Math.floor(Date.now() / 60000);
+
+    window.fetch(url, {cache: 'no-store'}).then(function (response) {
+        if (!response.ok) {
+            throw new Error('cover manifest: HTTP ' + response.status);
+        }
+        return response.json();
+    }).then(function (manifest) {
+        var list = Array.isArray(manifest) ? manifest : manifest && manifest.images;
+        var base = (manifest && manifest.base) || MANIFEST_URL.replace(/[^/]*$/, '');
+
+        if (!Array.isArray(list) || !list.length) {
+            return reveal();
+        }
+
+        var next = urlFor(list[Math.floor(Math.random() * list.length)], base);
+        if (!next) {
+            return reveal();
+        }
+
+        // Preload, so that assigning src paints from cache rather than showing
+        // a gap. A file that 404s leaves the default in place.
+        var preload = new window.Image();
+        preload.onload = function () {
+            image.removeAttribute('srcset');
+            image.src = next;
+            reveal();
+        };
+        preload.onerror = reveal;
+        preload.src = next;
+    }).catch(reveal);
+}
+
 function featured() {
     'use strict';
     var feed = document.querySelector('.featured-feed');
@@ -133,3 +234,7 @@ function featured() {
         },
     });
 }
+
+// Appended after the calls at the top of this file so that the random cover is
+// layered on top of the normal cover() behaviour rather than replacing it.
+coverPool();

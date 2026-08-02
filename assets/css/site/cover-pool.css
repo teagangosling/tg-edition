@@ -1,0 +1,22 @@
+/* Random publication cover.
+ *
+ * `coverPool()` in assets/js/main.js may replace the cover image with a random
+ * pick from /content/images/covers/. While it is deciding and preloading, it
+ * holds this class on `.cover` so the Ghost Admin default is never painted and
+ * then visibly swapped.
+ *
+ * This deliberately duplicates the look of `.cover.image-loading` rather than
+ * reusing that class: `cover()` removes `.image-loading` as soon as the *default*
+ * image has loaded, which is exactly the moment we still need the overlay up.
+ *
+ * main.js always removes this class - on success, on failure, and on a timeout -
+ * so a broken manifest can never leave the cover permanently dark. Without JS the
+ * class is never added at all and the cover renders exactly as it does today. */
+
+.cover.cover-pool-pending::before {
+    opacity: 1;
+}
+
+.cover.cover-pool-pending .cover-image {
+    transform: scale(1.02);
+}
