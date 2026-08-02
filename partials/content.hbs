@@ -1,0 +1,136 @@
+<article class="single {{post_class}}">
+
+    {{#match @page.show_title_and_feature_image}}
+        <header class="single-header gh-canvas">
+            <h1 class="single-title">{{title}}</h1>
+
+            {{#if custom_excerpt}}
+                <div class="single-excerpt">
+                    {{custom_excerpt}}
+                </div>
+            {{/if}}
+
+            {{#is "post"}}
+            <div class="single-byline">
+                <div class="single-byline-author">
+                    <div class="single-byline-avatar u-placeholder square">
+                        {{#if primary_author.profile_image}}
+                            <img class="u-object-fit" src="{{img_url primary_author.profile_image size="xs"}}" alt="{{primary_author.name}}" loading="lazy">
+                        {{else}}
+                            <span class="u-object-fit">{{> "icons/avatar"}}</span>
+                        {{/if}}
+                    </div>
+                    <span class="single-byline-name">{{primary_author.name}}</span>
+                </div>
+
+                <dl class="single-byline-dates">
+                    <div class="single-byline-row">
+                        <dt class="single-byline-label">Published</dt>
+                        <dd class="single-byline-value">
+                            <time datetime="{{date published_at format="YYYY-MM-DD"}}">{{date published_at format="DD MMM YYYY"}}</time>
+                        </dd>
+                    </div>
+                    {{!-- Trip date comes from internal tags on the post: #trip-2025-05-12 for the
+                          start, and optionally #tripend-2025-05-14 for a multi-day trip. --}}
+                    {{#foreach tags visibility="all"}}
+                        {{#match name "~^" "#trip-"}}
+                        <div class="single-byline-row">
+                            <dt class="single-byline-label">Trip date</dt>
+                            <dd class="single-byline-value">
+                                <time class="js-trip-date" data-trip="{{name}}">{{name}}</time>
+                            </dd>
+                        </div>
+                        {{/match}}
+                    {{/foreach}}
+                </dl>
+
+                {{#foreach tags visibility="all"}}
+                    {{#match name "~^" "#tripend-"}}
+                        <span class="js-trip-end" data-tripend="{{name}}" hidden></span>
+                    {{/match}}
+                {{/foreach}}
+            </div>
+
+            {{!-- data-cfasync="false" keeps Cloudflare Rocket Loader from deferring this,
+                  so the trip date is rewritten during parse with no visible swap. --}}
+            <script data-cfasync="false">
+                (function () {
+                    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    var DASH = "–";
+
+                    // "#trip-2025-05-12" / "#tripend-2025-05-14" -> {y, m, d} or null
+                    function parseTag(raw, prefix) {
+                        var value = (raw || "").replace(prefix, "");
+                        var parts = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                        if (!parts) {
+                            return null;
+                        }
+                        return {iso: value, y: parts[1], m: Number(parts[2]) - 1, d: parts[3]};
+                    }
+
+                    function day(date) {
+                        return date.d;
+                    }
+
+                    function dayMonth(date) {
+                        return date.d + " " + months[date.m];
+                    }
+
+                    function full(date) {
+                        return date.d + " " + months[date.m] + " " + date.y;
+                    }
+
+                    // Drop the parts the two ends share, so only what differs is repeated.
+                    function formatRange(start, end) {
+                        if (!end || end.iso === start.iso) {
+                            return full(start);
+                        }
+                        if (start.y !== end.y) {
+                            return full(start) + DASH + full(end);
+                        }
+                        if (start.m !== end.m) {
+                            return dayMonth(start) + DASH + full(end);
+                        }
+                        return day(start) + DASH + full(end);
+                    }
+
+                    var endNode = document.querySelector(".single-byline .js-trip-end");
+                    var end = endNode ? parseTag(endNode.getAttribute("data-tripend"), /^#?tripend-/i) : null;
+
+                    var nodes = document.querySelectorAll(".js-trip-date");
+                    for (var i = 0; i < nodes.length; i++) {
+                        var el = nodes[i];
+                        var rawStart = (el.getAttribute("data-trip") || "").replace(/^#?trip-/i, "");
+                        var start = parseTag(el.getAttribute("data-trip"), /^#?trip-/i);
+                        if (start) {
+                            el.setAttribute("datetime", start.iso);
+                            el.textContent = formatRange(start, end);
+                        } else {
+                            el.textContent = rawStart.replace(/-/g, " ");
+                        }
+                    }
+                })();
+            </script>
+            {{/is}}
+
+            {{!-- Author archives are disabled in routes.yaml, so this is plain text, not {{authors}} (which would link to /404/). --}}
+            <div class="author-name" style="display: none;">{{primary_author.name}}</div>
+
+            {{#if feature_image}}
+            {{#unless no_image}}
+                <figure class="single-media kg-width-{{width}}">
+                    <img srcset="{{> "srcset"}}" sizes="(min-width: 1023px) 920px, calc(90vw)" src="{{img_url feature_image size="l"}}" alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}">
+                    {{#if feature_image_caption}}
+                        <figcaption>{{feature_image_caption}}</figcaption>
+                    {{/if}}
+                </figure>
+            {{/unless}}
+            {{/if}}
+        </header>
+    {{/match}}
+
+    <div class="single-content gh-content gh-canvas">
+        {{content}}
+    </div>
+
+</article>

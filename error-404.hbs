@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="{{@site.locale}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>Page not found &mdash; {{@site.title}}</title>
+
+    <link rel="stylesheet" href="{{asset "built/screen.css"}}">
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body.error-404 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 8vmin 6vmin;
+            box-sizing: border-box;
+            background-color: #000;
+            background-image: url({{asset "images/404.jpg"}});
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            text-align: center;
+        }
+
+        body.error-404::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.75);
+        }
+
+        .error-404-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 34rem;
+            color: #fff;
+        }
+
+        .error-404-title {
+            margin: 0;
+            color: #fff;
+            font-size: clamp(2rem, 5.5vw, 3.6rem);
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+        }
+
+        .error-404-home {
+            margin: 1.8rem 0 0;
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+        }
+
+        .error-404-home a {
+            color: #fff;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            padding-bottom: 0.15em;
+            transition: border-color 0.2s ease;
+        }
+
+        .error-404-home a:hover {
+            border-bottom-color: #fff;
+        }
+    </style>
+</head>
+
+<body class="error-404">
+    <div class="error-404-inner">
+        <h1 class="error-404-title">This page hasn&rsquo;t quite landed yet.</h1>
+        <p class="error-404-home"><a href="{{@site.url}}">Return home</a></p>
+    </div>
+</body>
+
+</html>

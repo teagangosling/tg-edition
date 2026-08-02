@@ -1,0 +1,165 @@
+# --- Ghost defaults ---
+User-agent: *
+Sitemap: https://teagangosling.com/sitemap.xml
+Disallow: /ghost/
+Disallow: /email/
+Disallow: /members/api/comments/counts/
+Disallow: /r/
+Disallow: /webmentions/receive/
+Disallow: /.ghost/analytics/api/
+
+# --- AI crawlers, scrapers and agents: not welcome ---
+
+# OpenAI
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: OAI-SearchBot
+Disallow: /
+
+# Anthropic
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Claude-User
+Disallow: /
+
+User-agent: Claude-SearchBot
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+# Google AI (note: Googlebot itself is still allowed above)
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: GoogleOther
+Disallow: /
+
+# Common Crawl (training-data source for many models)
+User-agent: CCBot
+Disallow: /
+
+# Apple
+User-agent: Applebot-Extended
+Disallow: /
+
+# Meta
+User-agent: FacebookBot
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Disallow: /
+
+User-agent: Meta-ExternalFetcher
+Disallow: /
+
+# Amazon
+User-agent: Amazonbot
+Disallow: /
+
+# ByteDance / TikTok
+User-agent: Bytespider
+Disallow: /
+
+User-agent: TikTokSpider
+Disallow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: Perplexity-User
+Disallow: /
+
+# Mistral
+User-agent: MistralAI-User
+Disallow: /
+
+# Cohere
+User-agent: cohere-ai
+Disallow: /
+
+User-agent: cohere-training-data-crawler
+Disallow: /
+
+# You.com
+User-agent: YouBot
+Disallow: /
+
+# Common Crawl-adjacent / AI search & scraping services
+User-agent: Diffbot
+Disallow: /
+
+User-agent: omgili
+Disallow: /
+
+User-agent: omgilibot
+Disallow: /
+
+User-agent: Webzio-Extended
+Disallow: /
+
+User-agent: ImagesiftBot
+Disallow: /
+
+User-agent: Timpibot
+Disallow: /
+
+User-agent: Kangaroo Bot
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: Scrapy
+Disallow: /
+
+User-agent: SemrushBot-OCOB
+Disallow: /
+
+User-agent: AI2Bot
+Disallow: /
+
+User-agent: AI2Bot-Dolma
+Disallow: /
+
+User-agent: DuckAssistBot
+Disallow: /
+
+User-agent: iaskspider/2.0
+Disallow: /
+
+User-agent: ISSCyberRiskCrawler
+Disallow: /
+
+User-agent: Sidetrade indexer bot
+Disallow: /
+
+User-agent: VelenPublicWebCrawler
+Disallow: /
+
+User-agent: img2dataset
+Disallow: /
+
+User-agent: peer39_crawler
+Disallow: /
+
+User-agent: firecrawl
+Disallow: /
+
+User-agent: FirecrawlAgent
+Disallow: /
+
+User-agent: Devin
+Disallow: /
+
+User-agent: OpenAI-SearchBot
+Disallow: /
