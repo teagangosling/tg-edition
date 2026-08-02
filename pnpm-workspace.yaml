@@ -1,0 +1,6 @@
+# CI installs with pnpm 11, which treats any skipped dependency build script as a
+# hard install failure. gscan pulls in bunyan -> dtrace-provider, an optional native
+# module we never need built, so the gate has to be off for the install to complete.
+ignoredBuiltDependencies:
+  - dtrace-provider
+strictDepBuilds: false
