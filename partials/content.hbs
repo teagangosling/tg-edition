@@ -12,6 +12,9 @@
 
             {{#is "post"}}
             <div class="single-byline">
+                {{!-- The "Show author" setting in Customize hides only the author block; the
+                      published/trip dates below stay regardless. --}}
+                {{#if @custom.show_author}}
                 <div class="single-byline-author">
                     <div class="single-byline-avatar u-placeholder square">
                         {{#if primary_author.profile_image}}
@@ -22,6 +25,7 @@
                     </div>
                     <span class="single-byline-name">{{primary_author.name}}</span>
                 </div>
+                {{/if}}
 
                 <dl class="single-byline-dates">
                     <div class="single-byline-row">
