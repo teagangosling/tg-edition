@@ -1,6 +1,6 @@
 {
     "name": "tg-edition",
-    "description": "A clean, minimal newsletter theme for the Ghost publishing platform",
+    "description": "Personal fork of Edition, the Ghost newsletter theme by the Ghost Foundation",
     "version": "1.0.0",
     "private": true,
     "engines": {
@@ -8,10 +8,16 @@
     },
     "license": "MIT",
     "author": {
-        "name": "Ghost Foundation",
-        "email": "hello@ghost.org",
-        "url": "https://ghost.org"
+        "name": "Teagan Gosling",
+        "email": "teagangosling@users.noreply.github.com"
     },
+    "contributors": [
+        {
+            "name": "Ghost Foundation",
+            "email": "hello@ghost.org",
+            "url": "https://ghost.org"
+        }
+    ],
     "keywords": [
         "ghost",
         "theme",
