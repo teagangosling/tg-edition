@@ -18,6 +18,50 @@
     margin-left: auto;
 }
 
+/* Text-wrapped images. floatedImages() in main.js moves a marked figure and
+   the text blocks that follow it into .tg-float-wrap, because .gh-canvas is a
+   grid and a float cannot reach out of its own grid item. The wrapper takes
+   the same column the grid gives every other block, and flow-root makes it
+   contain the float without a clearfix. */
+
+.tg-float-wrap {
+    grid-column: main;
+    display: flow-root;
+}
+
+/* Narrower than this there is not enough column left for the text to read as
+   a column, so nothing floats and the wrapper is just a plain block. */
+
+@media (min-width: 1024px) {
+    .tg-float-left,
+    .tg-float-right {
+        width: 40%;
+        margin-top: 0;
+        margin-bottom: 1.6rem;
+    }
+
+    .tg-float-left {
+        float: left;
+        margin-right: 3.2rem;
+        margin-left: 0;
+    }
+
+    .tg-float-right {
+        float: right;
+        margin-left: 3.2rem;
+        margin-right: 0;
+    }
+
+    /* The image keeps width:auto from above so the max-height cap can still
+       shrink it without squashing it; max-width just holds it to the float. */
+    .tg-float-left figcaption,
+    .tg-float-right figcaption {
+        margin-top: 0.8rem;
+        font-size: 1.3rem;
+        text-align: left;
+    }
+}
+
 /* Anything that opens full size on click gets the same affordance, whether
    it's wired up by the shared theme assets or by expandableImages(). */
 

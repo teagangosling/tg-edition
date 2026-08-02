@@ -6,6 +6,7 @@ var st = 0;
 cover();
 featured();
 pagination(false);
+floatedImages();
 expandableImages();
 
 window.addEventListener('scroll', function () {
@@ -45,6 +46,58 @@ function cover() {
     document.querySelector('.cover-arrow').addEventListener('click', function () {
         var element = cover.nextElementSibling;
         element.scrollIntoView({behavior: 'smooth', block: 'start'});
+    });
+}
+
+// Ghost lays .gh-content.gh-canvas out as a CSS grid: every paragraph and
+// every card is its own grid item. A float on a figure therefore has nothing
+// to wrap around it, because the text lives in sibling grid items and a float
+// cannot escape the item it is in. So the figure and the text blocks that
+// should flow beside it are moved into one wrapper element, which becomes a
+// single grid item; the float then resolves inside that wrapper's own block
+// formatting context, which is the only place it can affect the text.
+//
+// This has to run before expandableImages() would matter either way - moving
+// an element with appendChild keeps its listeners - but doing it first means
+// the lightbox pass sees the final DOM, so there is only ever one arrangement
+// to reason about.
+function floatedImages() {
+    'use strict';
+    var content = document.querySelector('.gh-content');
+    if (!content) return;
+
+    // Authors opt in by ending the image's alt text with [left] or [right].
+    var marker = /\s*\[\s*(left|right)\s*\]\s*$/i;
+    // Blocks that read sensibly beside a floated image. Everything else - a
+    // heading, a rule, another card - ends the run and is left outside the
+    // wrapper, which is what makes the float clear at a natural break.
+    var wrappable = 'p, ul, ol, blockquote';
+
+    content.querySelectorAll('img[alt]').forEach(function (img) {
+        var alt = img.getAttribute('alt');
+        var match = alt.match(marker);
+        if (!match) return;
+
+        // Strip the marker so it is never announced by a screen reader.
+        img.setAttribute('alt', alt.replace(marker, ''));
+
+        var figure = img.closest('figure.kg-card');
+        if (!figure) return;
+
+        figure.classList.add('tg-float-' + match[1].toLowerCase());
+
+        // Only a direct child of the grid is a grid item, so only that case
+        // needs - or can use - the wrapper.
+        if (figure.parentNode !== content) return;
+
+        var wrapper = document.createElement('div');
+        wrapper.className = 'tg-float-wrap';
+        content.insertBefore(wrapper, figure);
+        wrapper.appendChild(figure);
+
+        while (wrapper.nextElementSibling && wrapper.nextElementSibling.matches(wrappable)) {
+            wrapper.appendChild(wrapper.nextElementSibling);
+        }
     });
 }
 
